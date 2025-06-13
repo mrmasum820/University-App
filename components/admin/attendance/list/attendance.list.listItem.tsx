@@ -109,8 +109,8 @@ export default function AttendanceListListItem() {
     {
       accessorKey: "attendance",
       header: () => <span>Attendance</span>,
-      cell: ({ row }) => {
-        const { attendance } = row.original;
+      cell: ({}) => {
+        // const { attendance } = row.original;
         return (
           <div>
             {/* <p className="mt-2 mb-4 text-gray-900 font-semibold ">

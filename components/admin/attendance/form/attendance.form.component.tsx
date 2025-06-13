@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useRef } from "react";
 import {
-  attendanceDefaultValues,
+  attendanceSchemaDefaultValues,
   attendanceSchema,
   AttendanceSchemaType,
 } from "./attendance.form.model";
@@ -64,7 +64,7 @@ export default function AttendanceFormComponent() {
   };
   return (
     <Form
-      defaultValues={attendanceDefaultValues}
+      defaultValues={attendanceSchemaDefaultValues}
       schema={attendanceSchema}
       onSubmit={onSubmit}
       ref={formRef}

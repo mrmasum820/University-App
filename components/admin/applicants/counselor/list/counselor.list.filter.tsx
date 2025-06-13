@@ -1,0 +1,81 @@
+import {
+  CounselorEntity,
+  DropdownFilterType,
+  refetchFn,
+  TableFilterProps,
+  TrashEntity,
+} from "@/common";
+import { CounselorQueryKey, counselorTrash } from "@/common/api";
+import { ActionDropdown, OutlineButton } from "@/uikit/ui";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
+
+export default function CounselorListFilter({
+  table,
+}: TableFilterProps<CounselorEntity>) {
+  const queryClient = useQueryClient();
+  const { control, handleSubmit } = useForm({
+    mode: "all",
+    defaultValues: {
+      status: "",
+    },
+  });
+
+  const mutation = useMutation<TrashEntity, Error, TrashEntity>({
+    mutationKey: [CounselorQueryKey.Delete],
+    mutationFn: (value) => counselorTrash(value),
+    onSettled: () => {
+      refetchFn(queryClient, CounselorQueryKey.ALL_List);
+      table.toggleAllRowsSelected(false);
+    },
+  });
+
+  const onActionTrash: SubmitHandler<DropdownFilterType> = async (
+    data: DropdownFilterType
+  ) => {
+    const tableId = table
+      ?.getSelectedRowModel()
+      ?.rows?.map((row: { original: { id: number } }) => row.original.id);
+    mutation.mutateAsync({
+      ids: tableId,
+      status: data?.status,
+    });
+  };
+
+  return (
+    <>
+      {/* <TableFilterItemTab tableData={tableData} /> */}
+
+      <div className="md:flex items-center mb-4">
+        <form
+          onSubmit={handleSubmit(onActionTrash)}
+          className="md:flex items-center mb-4"
+        >
+          <div className="min-w-56 md:mr-1">
+            <Controller
+              control={control}
+              name="status"
+              render={({ field }) => {
+                return (
+                  <ActionDropdown
+                    onChange={(e) => field.onChange(e?.label?.toLowerCase())}
+                    options={[
+                      { id: 3, label: "Active" },
+                      { id: 1, label: "Draft" },
+                      { id: 2, label: "Trash" },
+                    ]}
+                  />
+                );
+              }}
+            />
+          </div>
+          <div className="md:mx-2">
+            <OutlineButton type="submit" className="px-8">
+              Apply
+            </OutlineButton>
+          </div>
+        </form>
+      </div>
+    </>
+  );
+}
